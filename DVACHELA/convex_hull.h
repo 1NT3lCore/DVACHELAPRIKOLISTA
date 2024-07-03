@@ -55,3 +55,5 @@ void read_points_from_file(vector<point2d>& points);
 void display_menu();
 
 void read_points_from_keyboard(vector<point2d>& points);
+
+void enterData(vector<point2d>& points, bool& dataEntered);

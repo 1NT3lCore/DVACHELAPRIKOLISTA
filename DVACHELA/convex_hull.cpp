@@ -110,7 +110,7 @@ void restart_program() {
         &si,       // Структура STARTUPINFO
         &pi        // Структура PROCESS_INFORMATION
     )) {
-        std::cerr << "Не удалось перезапустить программу." << std::endl;
+        std::cerr << "\nНе удалось перезапустить программу.\n" << std::endl;
     }
     else {
         // Закрываем дескрипторы процесса и потока
@@ -124,11 +124,11 @@ void restart_program() {
 
 void check_for_exit(const string& input) {
     if (input == "exit") {
-        std::cout << "Программа прервана пользователем." << std::endl;
+        std::cout << "\nПрограмма прервана пользователем.\n" << std::endl;
         exit(0); // Завершение программы
     }
     else if (input == "restart") {
-        std::cout << "Перезапуск программы..." << std::endl;
+        std::cout << "\nПерезапуск программы...\n" << std::endl;
         restart_program(); // Вызов функции перезапуска
     }
 }
@@ -138,7 +138,7 @@ void algorithm_selection(vector<point2d>& points) {
     Result graham_result, jarvis_result;
     int choice;
     do {
-        std::cout << "Выберите алгоритм для вычисления выпуклой оболочки:\n";
+        std::cout << "\nВыберите алгоритм для вычисления выпуклой оболочки:\n";
         std::cout << "1. Сканирование Грэхема\n";
         std::cout << "2. Марш Джарвиса\n";
         std::cout << "3. Сравнить оба алгоритма\n";
@@ -151,7 +151,7 @@ void algorithm_selection(vector<point2d>& points) {
             if (choice >= 1 && choice <= 3) break; // Выход из цикла, если введено корректное значение
         }
 
-        std::cout << "Неверный выбор. Пожалуйста, введите 1, 2 или 3.\n";
+        std::cout << "\nНеверный выбор. Пожалуйста, введите 1, 2 или 3.\n";
     } while (true);
 
     // Выполнение выбранного алгоритма или сравнение
@@ -159,7 +159,7 @@ void algorithm_selection(vector<point2d>& points) {
     case 1:
         graham_result = graham_scan(points);
         // Вывод точек выпуклой оболочки для Грэхема
-        cout << "Точки выпуклой оболочки Грэхема:\n";
+        cout << "\nТочки выпуклой оболочки Грэхема:\n";
         for (const auto& pt : graham_result.ch) {
             cout << pt.x << ' ' << pt.y << '\n';
         }
@@ -167,7 +167,7 @@ void algorithm_selection(vector<point2d>& points) {
     case 2:
         jarvis_result = jarvis_march(points);
         // Вывод точек выпуклой оболочки для Джарвиса
-        cout << "Точки выпуклой оболочки Джарвиса:\n";
+        cout << "\nТочки выпуклой оболочки Джарвиса:\n";
         for (const auto& pt : jarvis_result.ch) {
             cout << pt.x << ' ' << pt.y << '\n';
         }
@@ -176,11 +176,11 @@ void algorithm_selection(vector<point2d>& points) {
         graham_result = graham_scan(points);
         jarvis_result = jarvis_march(points);
         // Вывод результатов сравнения
-        cout << "Сравнение алгоритмов:\n";
+        cout << "\nСравнение алгоритмов:\n";
         cout << "Время выполнения Грэхема: " << graham_result.time << " микросекунд\n";
         cout << "Время выполнения Джарвиса: " << jarvis_result.time << " микросекунд\n";
         cout << "Количество итераций Грэхема: " << graham_result.iterations << "\n";
-        cout << "Количество итераций Джарвиса: " << jarvis_result.iterations << "\n";
+        cout << "Количество итераций Джарвиса: " << jarvis_result.iterations << "\n\n";
         // Определение более быстрого алгоритма
         if (graham_result.time < jarvis_result.time) {
             cout << "Алгоритм Грэхема быстрее.\n";
@@ -195,14 +195,112 @@ void algorithm_selection(vector<point2d>& points) {
             cout << "Алгоритм Джарвиса выполняется за меньшее количество итераций\n";
         }
         // Вывод точек выпуклой оболочки для сравнения
-        cout << "Точки выпуклой оболочки Грэхема:\n";
+        cout << "\nТочки выпуклой оболочки Грэхема:\n";
         for (const auto& pt : graham_result.ch) {
             cout << pt.x << ' ' << pt.y << '\n';
         }
-        cout << "Точки выпуклой оболочки Джарвиса:\n";
+        cout << "\nТочки выпуклой оболочки Джарвиса:\n";
         for (const auto& pt : jarvis_result.ch) {
             cout << pt.x << ' ' << pt.y << '\n';
         }
         break;
+    }
+}
+
+void enterData(vector<point2d>& points, bool& dataEntered) {
+    string input;
+    int n;
+    while (!dataEntered) {
+        cout << "Выберите способ ввода данных:\n";
+        cout << "1. Ввести данные с клавиатуры\n";
+        cout << "2. Прочитать данные из файла\n";
+        cout << "Введите ваш выбор (1 или 2), exit - закончить выполнение программы, restart - перезапуск программы: ";
+        getline(cin, input);
+        check_for_exit(input);
+
+        if (input == "1") {
+            do {
+                std::cout << "\nВведите количество точек (должно быть натуральным числом и >= 3), exit - закончить выполнение программы, restart - перезапуск программы: ";
+                std::getline(std::cin, input);
+                check_for_exit(input); // Проверка на команду 'exit'
+
+                if (is_int(input)) {
+                    n = std::stoi(input);
+                    if (n >= 3) {
+                        points.resize(n); // Изменяем размер вектора, объявленного в начале функции main
+                        break; // Выход из цикла, если введено корректное значение
+                    }
+                }
+
+                std::cout << "\nНеверный ввод. Пожалуйста, введите корректное натуральное число >= 3.\n";
+            } while (true);
+
+            for (int i = 0; i < n; ++i) {
+                do {
+                    std::cout << "\nВведите точку " << i + 1 << " (x,y), exit - закончить выполнение программы, restart - перезапуск программы: ";
+                    std::getline(std::cin, input);
+                    check_for_exit(input);
+                    std::stringstream ss(input);
+                    std::string x_str, y_str;
+                    std::getline(ss, x_str, ',');
+                    std::getline(ss, y_str, ',');
+
+
+                    if (is_int(x_str) && is_int(y_str)) {
+                        points[i].x = std::stoi(x_str);
+                        points[i].y = std::stoi(y_str);
+                        break; // Выход из цикла, если введены корректные значения
+                    }
+
+                    std::cout << "\n\nНеверный ввод, пожалуйста, введите действительные целые числа, разделенные запятой.\n";
+                } while (true);
+            }
+            dataEntered = true;
+        }
+        else if (input == "2") {
+            cout << "\nВведите имя файла: ";
+            getline(cin, input);
+            check_for_exit(input);
+
+            ifstream file(input);
+            if (file.is_open()) {
+                file.seekg(0, ios::end);
+                if (file.tellg() == 0) {
+                    cout << "\n\nФайл пуст.\n";
+                }
+                else {
+                    file.seekg(0, ios::beg);
+                    string line;
+                    while (getline(file, line)) { // Считываем строку из файла
+                        stringstream ss(line);
+                        string x_str, y_str;
+                        getline(ss, x_str, ',');
+                        getline(ss, y_str, ',');
+
+                        if (is_int(x_str) && is_int(y_str)) {
+                            long long x = stoll(x_str);
+                            long long y = stoll(y_str);
+                            points.emplace_back(x, y); // Добавляем точку в вектор
+                        }
+                        else {
+                            cout << "\n\nНекорректные данные в строке: " << line << '\n';
+                        }
+                    }
+                    if (!points.empty()) {
+                        dataEntered = true;
+                    }
+                    else {
+                        cout << "\n\nВсе строки файла содержат некорректные данные.\n";
+                    }
+                }
+                file.close();
+            }
+            else {
+                cout << "\n\nНе удалось открыть файл. Пожалуйста, проверьте имя файла и путь к нему.\n";
+            }
+        }
+        else {
+            cout << "\n\nНеверный выбор. \n";
+        }
     }
 }
